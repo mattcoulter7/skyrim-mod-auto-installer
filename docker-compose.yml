@@ -1,0 +1,26 @@
+version: '3'
+services:
+  skyrim-mod-auto-installer-test:
+    image: skyrim-mod-auto-installer:latest
+    container_name: skyrim-mod-auto-installer-test
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        GIT_USERNAME: ${GIT_USERNAME}
+        GIT_PAT: ${GIT_PAT}
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+    networks:
+      - skyrim-mod-auto-installer
+    ports:
+      - 5678:5678
+    env_file:
+      - ./.env
+    entrypoint: [ "python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m", "pytest", "tests/"]
+
+networks:
+  skyrim-mod-auto-installer:
+    driver: bridge

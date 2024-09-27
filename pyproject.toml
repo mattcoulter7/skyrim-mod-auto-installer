@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "skyrim-mod-auto-installer"
+version = "0.1.0"
+description = "Automatically install skyrim mods instaed of having to manually going 1 by 1. Doesn't require premium NexusMods account."
+authors = ["Matthew Coulter <53892067+mattcoulter7@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+selenium = "^4.25.0"
+psutil = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+debugpy = "^1.8.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
