@@ -29,7 +29,15 @@
         {
             "label": "Compile into .exe",
             "type": "shell",
-            "command": "poetry run pyinstaller --name app --onefile app.py",
+            "command": "poetry",
+            "args": [
+                "run",
+                "pyinstaller",
+                "--name", "Skyrim Mod Auto Installer",
+                "--icon=assets/icon.ico",
+                "--onefile",
+                "app.py"
+            ],
             "problemMatcher": [],
             "group": {
                 "kind": "build"
