@@ -13,7 +13,7 @@ from diskcache import Cache
 from .utils import try_find_element
 from .tab_driver import TabDriver
 
-cache = Cache("collection_mod_urls")
+cache = Cache(".skyrim-mod-auto-installer_cache")
 
 
 def fetch_collection_mod_urls(
