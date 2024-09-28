@@ -15,10 +15,24 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
-from .mod_installer import SkyrimModInstaller, SkyrimModInstallerBySearch
+from .collection_installer import fetch_collection_mod_urls
+from .mod_installer import (
+    BaseSkyrimModInstaller,
+    SkyrimModInstallerBySearch,
+    SkyrimModInstallerByURL,
+)
 from .constants import CHROME_PORT
 from .utils import chunk_list
 
+# Typing definition for a callable that matches the signature of `run_mod_search_installer`
+RunModInstallerType = typing.Callable[
+    [
+        typing.Iterable[str],  # mod_names argument
+        typing.Optional[int],      # max_concurrent_tabs_per_browser_instance (keyword-only)
+        typing.Optional[str],      # instance_id (keyword-only)
+    ],
+    None
+]
 
 def create_instance_id() -> str:
     return str(uuid.uuid4())
@@ -32,22 +46,23 @@ def get_default_chrome_profile_path() -> typing.Tuple[str, str]:
     return chrome_profile_path, "Default"
 
 
-def get_or_create_test_profile(instance_id: str) -> typing.Tuple[str, str]:
+def get_or_create_test_profile(
+    instance_id: typing.Optional[str] = None,
+) -> typing.Tuple[str, str]:
     profile_path, profile = get_default_chrome_profile_path()
+    if instance_id is None:
+        return profile_path, profile
 
-    # Create a unique directory for each instance's profile
-    # home_dir = os.path.expanduser("~")
-    instance_profile_path = profile_path  # os.path.join(home_dir, f".skyrim-mod-auto-installer")
     instance_profile = f"{profile}{instance_id}"
 
-    if not os.path.exists(os.path.join(instance_profile_path, instance_profile)):
+    if not os.path.exists(os.path.join(profile_path, instance_profile)):
         # Copy the default profile to the new directory
-        shutil.copytree(os.path.join(profile_path, profile), os.path.join(instance_profile_path, instance_profile))
-        logging.info(f"Profile copied to {instance_profile_path}")
+        shutil.copytree(os.path.join(profile_path, profile), os.path.join(profile_path, instance_profile))
+        logging.info(f"Profile copied to {profile_path}")
     else:
-        logging.info(f"Using existing profile at {instance_profile_path}")
+        logging.info(f"Using existing profile at {profile_path}")
 
-    return instance_profile_path, instance_profile
+    return profile_path, instance_profile
 
 
 def kill_chrome_processes():
@@ -66,7 +81,10 @@ def start_chrome_with_debugging():
     logging.info(f"Chrome started with remote debugging on port {CHROME_PORT}.")
 
 
-def debug_chrome(instance_id: str, port: int = None) -> webdriver.Chrome:
+def debug_chrome(
+    instance_id: typing.Optional[str] = None,
+    port: typing.Optional[int] = None
+) -> webdriver.Chrome:
     profile_path, profile = get_or_create_test_profile(instance_id)
 
     # Generate a random port if none is provided to avoid conflicts
@@ -82,18 +100,43 @@ def debug_chrome(instance_id: str, port: int = None) -> webdriver.Chrome:
     return webdriver.Chrome(options=chrome_options)
 
 
-def run_installers(
-    mod_names: typing.List[str],
+def run_mod_collection_installer(
+    collection_url: str,
     *,
     max_browser_instances: typing.Optional[int] = None,
     max_concurrent_tabs_per_browser_instance: typing.Optional[int] = None,
 ):
     kill_chrome_processes()
 
-    mods_per_browser_instance = (len(mod_names) // max_browser_instances) + 1 \
+    driver = debug_chrome()
+
+    mod_urls = fetch_collection_mod_urls(
+        collection_url,
+        driver=driver,
+    )
+
+    driver.close()
+
+    return run_mod_installers(
+        mod_urls, run_mod_url_installer,
+        max_browser_instances=max_browser_instances,
+        max_concurrent_tabs_per_browser_instance=max_concurrent_tabs_per_browser_instance,
+    )
+
+
+def run_mod_installers(
+    mod_keys: typing.List[str],
+    installer_callback: RunModInstallerType,
+    *,
+    max_browser_instances: typing.Optional[int] = None,
+    max_concurrent_tabs_per_browser_instance: typing.Optional[int] = None,
+):
+    kill_chrome_processes()
+
+    mods_per_browser_instance = (len(mod_keys) // max_browser_instances) + 1 \
         if max_browser_instances is not None \
         else 1
-    mod_names_per_browser = chunk_list(mod_names, mods_per_browser_instance)
+    mod_names_per_browser = chunk_list(mod_keys, mods_per_browser_instance)
 
     max_instance_ids = max_browser_instances \
         if max_browser_instances is not None \
@@ -102,9 +145,9 @@ def run_installers(
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_browser_instances) as executor:
         for _ in executor.map(
-            lambda tuple: run_installer(
-                mod_names=tuple[1],
-                max_tabs_per_browser_instance=max_concurrent_tabs_per_browser_instance,
+            lambda tuple: installer_callback(
+                tuple[1],
+                max_concurrent_tabs_per_browser_instance=max_concurrent_tabs_per_browser_instance,
                 instance_id=tuple[0],
             ),
             zip(instance_ids, mod_names_per_browser)
@@ -114,14 +157,39 @@ def run_installers(
     return None
 
 
-def run_installer(
-    mod_names: typing.List[str],
+def run_mod_url_installer(
+    mod_urls: typing.Iterable[str],
     *,
-    max_tabs_per_browser_instance: typing.Optional[int] = None,
+    max_concurrent_tabs_per_browser_instance: typing.Optional[int] = None,
     instance_id: typing.Optional[str] = None,
 ):
-    instance_id = instance_id or create_instance_id()
+    return run_mod_installer(
+        mod_urls, SkyrimModInstallerByURL,
+        max_concurrent_tabs_per_browser_instance=max_concurrent_tabs_per_browser_instance,
+        instance_id=instance_id,
+    )
 
+
+def run_mod_search_installer(
+    mod_names: typing.Iterable[str],
+    *,
+    max_concurrent_tabs_per_browser_instance: typing.Optional[int] = None,
+    instance_id: typing.Optional[str] = None,
+):
+    return run_mod_installer(
+        mod_names, SkyrimModInstallerBySearch,
+        max_concurrent_tabs_per_browser_instance=max_concurrent_tabs_per_browser_instance,
+        instance_id=instance_id,
+    )
+
+
+def run_mod_installer(
+    mod_keys: typing.Iterable[str],
+    installer_clazz: typing.Type[BaseSkyrimModInstaller],
+    *,
+    max_concurrent_tabs_per_browser_instance: typing.Optional[int] = None,
+    instance_id: typing.Optional[str] = None,
+):
     # legacy approach to get the authenticated chrome with nexus mods was
     # by using shell which automatically used the default profile.
     # this was limited to a single browser, but we can actually include
@@ -135,21 +203,14 @@ def run_installer(
     # create lock for tab management
     driver_lock = threading.Lock()
 
-    # prepare the installer objects
-    mod_installers = [
-        SkyrimModInstallerBySearch(
-            mod_name=mod_name,
-            chrome_driver=driver,
-            driver_lock=driver_lock,
-        )
-        for mod_name in mod_names
-    ]
-
     # run the installers
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_tabs_per_browser_instance) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_tabs_per_browser_instance) as executor:
         for _ in executor.map(
-            lambda mod_installer: mod_installer.install(),
-            mod_installers
+            lambda mod_name: installer_clazz(
+                mod_name, driver,
+                driver_lock=driver_lock,
+            ).try_install(),
+            mod_keys
         ):
             pass
 

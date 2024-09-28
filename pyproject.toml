@@ -12,6 +12,7 @@ packages = [
 python = "^3.9"
 selenium = "^4.25.0"
 psutil = "*"
+diskcache = "*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

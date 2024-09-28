@@ -11,7 +11,7 @@ from .utils import try_find_element
 from .tab_driver import TabDriver
 
 
-class SkyrimModInstaller(TabDriver):
+class BaseSkyrimModInstaller(TabDriver):
     """
     Install a mod from NexusMods using Vortex. Assumes that the
     provided chrome diver is already authenticated, hence the
@@ -19,9 +19,9 @@ class SkyrimModInstaller(TabDriver):
     """
     def __init__(
         self,
-        mod_name: str,
         chrome_driver: Chrome,
         *,
+        mod_name: str = "",
         url: str = "",
         driver_lock: typing.Optional[threading.Lock] = None,
     ) -> None:
@@ -79,7 +79,24 @@ class SkyrimModInstaller(TabDriver):
         self.destroy_focus()
 
 
-class SkyrimModInstallerBySearch(SkyrimModInstaller):
+class SkyrimModInstallerByURL(BaseSkyrimModInstaller):
+    def __init__(
+        self,
+        url: str,
+        chrome_driver: Chrome,
+        *,
+        mod_name: str = "",
+        driver_lock: typing.Optional[threading.Lock] = None
+    ) -> None:
+        super().__init__(
+            chrome_driver,
+            mod_name=mod_name or url,
+            url=url,
+            driver_lock=driver_lock,
+        )
+
+
+class SkyrimModInstallerBySearch(BaseSkyrimModInstaller):
     def __init__(
         self,
         mod_name: str,
@@ -89,10 +106,10 @@ class SkyrimModInstallerBySearch(SkyrimModInstaller):
         driver_lock: typing.Optional[threading.Lock] = None
     ) -> None:
         super().__init__(
-            mod_name,
             chrome_driver,
+            mod_name=mod_name,
             url=url,
-            driver_lock=driver_lock
+            driver_lock=driver_lock,
         )
 
     def install(self):
