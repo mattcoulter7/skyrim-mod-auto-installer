@@ -131,7 +131,10 @@ def run_mod_installers(
     max_instance_ids = max_browser_instances \
         if max_browser_instances is not None \
         else len(mod_names_per_browser)
-    instance_ids = [str(i % max_instance_ids) for i in range(len(mod_names_per_browser))]
+    instance_ids = [
+        str(i % max_instance_ids) if (i % max_instance_ids) > 0 else None  # None is default profile
+        for i in range(len(mod_names_per_browser))
+    ]
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_browser_instances) as executor:
         for _ in executor.map(
