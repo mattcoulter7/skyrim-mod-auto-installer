@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python Debugger: main.py",
+      "name": "App Entry Point",
       "type": "debugpy",
       "request": "launch",
-      "program": "main.py",
+      "program": "app.py",
       "console": "integratedTerminal"
     },
     {
@@ -16,15 +16,6 @@
       "type": "python",
       "request": "launch",
       "module": "pytest",
-      "justMyCode": false,
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-    },
-    {
-      "name": "build",
-      "type": "python",
-      "request": "launch",
-      "module": "build",
       "justMyCode": false,
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
