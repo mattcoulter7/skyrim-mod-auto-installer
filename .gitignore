@@ -164,4 +164,4 @@ cython_debug/
 #.idea/
 
 # generated cache files
-/collection_mod_urls
+.skyrim-mod-auto-installer_cache*
