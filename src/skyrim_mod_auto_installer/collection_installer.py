@@ -1,19 +1,14 @@
-import threading
 import typing
 import time
-import logging
+import os
 
-from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import Chrome
 from diskcache import Cache
 
-from .utils import try_find_element
-from .tab_driver import TabDriver
-
-cache = Cache(".skyrim-mod-auto-installer_cache")
+cache_dir = os.path.join(os.path.expanduser("~"), ".skyrim-mod-auto-installer")
+cache = Cache(cache_dir)
 
 
 def fetch_collection_mod_urls(
