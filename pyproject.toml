@@ -17,6 +17,7 @@ diskcache = "*"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
 debugpy = "^1.8.6"
+pyinstaller = "*"
 
 [build-system]
 requires = ["poetry-core"]

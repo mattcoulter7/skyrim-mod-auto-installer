@@ -25,6 +25,29 @@
                 "reveal": "always",
                 "panel": "new"
             }
+        },
+        {
+            "label": "Compile into .exe",
+            "type": "shell",
+            "command": "poetry run pyinstaller --name app --onefile app.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": [
+                        "-NoExit",
+                        "-Command"
+                    ]
+                },
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
         }
     ],
     "inputs": []
