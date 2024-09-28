@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Chrome
 from diskcache import Cache
 
-cache_dir = os.path.join(os.path.expanduser("~"), ".skyrim-mod-auto-installer")
+cache_dir = os.path.join(os.path.expanduser("~"), ".skyrim-mod-auto-installer", ".cache")
 cache = Cache(cache_dir)
 
 
