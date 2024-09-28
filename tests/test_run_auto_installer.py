@@ -91,6 +91,6 @@ def test():
             "WiZkiD Riften and Ratway",
             "powerofthree's Tweaks",
         ],
-        max_workers=12,
+        max_workers=1,
         shuffle=True
     )

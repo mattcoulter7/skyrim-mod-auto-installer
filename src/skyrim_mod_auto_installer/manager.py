@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
-from .mod_installer import SkyrimModInstaller
+from .mod_installer import SkyrimModInstaller, SkyrimModInstallerBySearch
 from .constants import CHROME_PORT
 
 
@@ -61,7 +61,7 @@ def run_installer(
 
     # prepare the installer objects
     mod_installers = [
-        SkyrimModInstaller(
+        SkyrimModInstallerBySearch(
             mod_name=mod_name,
             chrome_driver=driver,
             driver_lock=driver_lock,
@@ -72,7 +72,7 @@ def run_installer(
     # run the installers
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for _ in executor.map(
-            lambda mod_installer: mod_installer.try_install(),
+            lambda mod_installer: mod_installer.install(),
             mod_installers
         ):
             pass
