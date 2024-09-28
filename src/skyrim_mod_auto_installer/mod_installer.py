@@ -33,10 +33,18 @@ class SkyrimModInstaller(TabDriver):
         self.mod_name = mod_name
 
     def try_install(self):
+        # try the install
         try:
             self.install()
         except Exception as e:
             logging.exception(f"Unable to install {self.mod_name}: {e}")
+
+        # if install fails, we should still try
+        # to clean up the browser session
+        try:
+            self.destroy_focus()
+        except Exception:
+            pass
 
     def install(self):
         self.init_focus()
@@ -92,34 +100,34 @@ class SkyrimModInstallerBySearch(SkyrimModInstaller):
 
         search_icons = self.do(
             lambda: self.chrome_driver.find_elements(By.XPATH, "//i[text()='search']"),
-            task_description=f"Retrieving search icons",
+            task_description=f"[{self.mod_name}] Retrieving search icons",
         )
         for i, search_icon in enumerate(search_icons, start=1):
             try:
                 self.do(
                     lambda: search_icon.click(),
-                    task_description=f"Ensuring Search Bar Is Visible {i}"
+                    task_description=f"[{self.mod_name}] Ensuring Search Bar Is Visible {i}"
                 )
             except Exception:
                 pass
 
         search_box = self.do(
             lambda: self.chrome_driver.find_element(By.XPATH, '//input[@name="gsearch"]'),
-            task_description=f"Finding Search Bar"
+            task_description=f"[{self.mod_name}] Finding Search Bar"
         )
         self.do(
             lambda: search_box.send_keys(self.mod_name),
-            task_description=f"Typing mod name..."
+            task_description=f"[{self.mod_name}] Typing mod name..."
         )
         search_box = self.do(
             lambda: search_box.send_keys(Keys.RETURN),
-            task_description=f"Searching Mod"
+            task_description=f"[{self.mod_name}] Searching Mod"
         )
 
         # Trigger the action inside the focus context
         self.do(
             lambda: self.chrome_driver.find_element(By.XPATH, f"//a[text()=\"{self.mod_name}\"]").click(),
-            task_description=f"Entering the mod page",
+            task_description=f"[{self.mod_name}] Entering the mod page",
             requires_tab_focus_until_end=False,
         )
 

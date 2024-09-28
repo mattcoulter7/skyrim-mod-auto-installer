@@ -1,7 +1,7 @@
 def test():
-    from skyrim_mod_auto_installer.manager import run_installer
+    from skyrim_mod_auto_installer.install_manager import run_installers
 
-    run_installer(
+    run_installers(
         mod_names=[
             "Arc's Dragon Masks REDUX 2k - 4k",
             "4K Stars and Galaxies",
@@ -91,6 +91,6 @@ def test():
             "WiZkiD Riften and Ratway",
             "powerofthree's Tweaks",
         ],
-        max_workers=1,
-        shuffle=True
+        max_browser_instances=1,
+        max_concurrent_tabs_per_browser_instance=6,
     )
