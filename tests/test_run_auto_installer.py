@@ -3,6 +3,6 @@ def test():
 
     run_mod_collection_installer(
         collection_url="https://next.nexusmods.com/skyrimspecialedition/collections/63guk8",
-        max_concurrent_tabs_per_browser_instance=1,
+        max_browser_instances=1,
         max_concurrent_tabs_per_browser_instance=12,
     )
