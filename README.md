@@ -27,11 +27,12 @@ I am open to contributing to this project, it is just for personal use so far so
 
 ## Development
 ### Development Environment Setup
-1. Ensure you have python 3.12.5 installed: `python --version`
+1. Ensure you have python 3.9.X installed: `python --version`
 2. Ensure pip is installed: `python -m ensurepip`
 3. Ensure pip is installed on the latest version: `python -m pip install --upgrade pip`
 4. Ensure poetry is installed: `pip install poetry`
 5. Install dependencies: `poetry install --with dev`
+6. You can immediately try running it with `python app.py`, or check the various Launch commands in .vscode
 
 ### Run tests
 All of the test scripts are locales under the `./tests` directory. Tests can be ran by running this script from python environment.
