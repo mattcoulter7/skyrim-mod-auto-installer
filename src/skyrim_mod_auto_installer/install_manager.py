@@ -1,9 +1,7 @@
 import os
-import time
 import psutil
 import subprocess
 import typing
-import logging
 import threading
 import concurrent.futures
 import random
@@ -11,9 +9,6 @@ import uuid
 import shutil
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 
 from .collection_installer import fetch_collection_mod_urls
 from .mod_installer import (
@@ -21,15 +16,16 @@ from .mod_installer import (
     SkyrimModInstallerBySearch,
     SkyrimModInstallerByURL,
 )
-from .constants import CHROME_PORT
 from .utils import chunk_list
+from . import logger
+
 
 # Typing definition for a callable that matches the signature of `run_mod_search_installer`
 RunModInstallerType = typing.Callable[
     [
         typing.Iterable[str],  # mod_names argument
-        typing.Optional[int],      # max_concurrent_tabs_per_browser_instance (keyword-only)
-        typing.Optional[str],      # instance_id (keyword-only)
+        typing.Optional[int],  # max_concurrent_tabs_per_browser_instance (keyword-only)
+        typing.Optional[str],  # instance_id (keyword-only)
     ],
     None
 ]
@@ -58,9 +54,9 @@ def get_or_create_test_profile(
     if not os.path.exists(os.path.join(profile_path, instance_profile)):
         # Copy the default profile to the new directory
         shutil.copytree(os.path.join(profile_path, profile), os.path.join(profile_path, instance_profile))
-        logging.info(f"Profile copied to {profile_path}")
+        logger.info(f"Profile copied to {profile_path}")
     else:
-        logging.info(f"Using existing profile at {profile_path}")
+        logger.info(f"Using existing profile at {profile_path}")
 
     return profile_path, instance_profile
 
@@ -72,13 +68,13 @@ def kill_chrome_processes():
         if process.info['name'].lower() == 'chrome.exe':
             # Terminate the process
             process.terminate()
-            logging.info(f"Killed process: {process.info['name']} (PID: {process.info['pid']})")
+            logger.info(f"Killed process: {process.info['name']} (PID: {process.info['pid']})")
 
 
 def start_chrome_with_debugging():
     # Command to start Chrome with remote debugging on port 9222
     subprocess.Popen(["start", "chrome", f"--remote-debugging-port={CHROME_PORT}"], shell=True)
-    logging.info(f"Chrome started with remote debugging on port {CHROME_PORT}.")
+    logger.info(f"Chrome started with remote debugging on port {CHROME_PORT}.")
 
 
 def debug_chrome(

@@ -1,7 +1,6 @@
 import threading
 import typing
 import time
-import logging
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -9,6 +8,7 @@ from selenium.webdriver import Chrome
 
 from .utils import try_find_element
 from .tab_driver import TabDriver
+from . import logger
 
 
 class BaseSkyrimModInstaller(TabDriver):
@@ -37,7 +37,7 @@ class BaseSkyrimModInstaller(TabDriver):
         try:
             self.install()
         except Exception as e:
-            logging.exception(f"Unable to install {self.mod_name}: {e}")
+            logger.exception(f"Unable to install {self.mod_name}: {e}")
 
         # if install fails, we should still try
         # to clean up the browser session
@@ -59,7 +59,7 @@ class BaseSkyrimModInstaller(TabDriver):
             lambda: try_find_element(self.chrome_driver, By.XPATH, "//a[@class='btn' and text()='Download']"),
             task_description=f"[{self.mod_name}] Searching for dependencies",
         ):
-            logging.info(f"[{self.mod_name}] Dependencies found")
+            logger.info(f"[{self.mod_name}] Dependencies found")
             self.do(
                 lambda: self.chrome_driver.find_element(By.XPATH, "//a[@class='btn' and text()='Download']").click(),
                 task_description=f"[{self.mod_name}] Ignoring Dependencies",

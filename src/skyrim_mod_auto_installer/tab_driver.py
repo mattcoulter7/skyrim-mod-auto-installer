@@ -1,6 +1,5 @@
 import threading
 import typing
-import logging
 import queue
 import time
 
@@ -9,6 +8,7 @@ from selenium.webdriver import Chrome
 from concurrent.futures import ThreadPoolExecutor
 
 from .utils import optional_lock
+from . import logger
 
 # Define a global ThreadPoolExecutor with a limited number of threads
 MAX_THREADS = 128  # You can adjust this based on your requirements
@@ -100,7 +100,7 @@ class TabDriver():
 
         # begin the task with tab focus
         if task_description:
-            logging.info(f"TASK BEGIN: {task_description}")
+            logger.info(f"TASK BEGIN: {task_description}")
         with self.focus():
             # Submit the task to the global thread pool executor
             future = global_executor.submit(wrapped_task)
@@ -109,12 +109,12 @@ class TabDriver():
 
         # finish the task with tab focus
         if task_description:
-            logging.info(f"TASK IN PROGRESS: {task_description}")
+            logger.info(f"TASK IN PROGRESS: {task_description}")
         with self.focus(requires_tab_focus_until_end):
             future.result()  # Wait for the task to complete
 
         if task_description:
-            logging.info(f"TASK COMPLETED: {task_description}")
+            logger.info(f"TASK COMPLETED: {task_description}")
 
         result = result_queue.get()
         if isinstance(result, Exception):
