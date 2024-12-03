@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "skyrim-mod-auto-installer"
-version = "0.1.0"
+version = "0.2.0"
 description = "Automatically install skyrim mods instaed of having to manually going 1 by 1. Doesn't require premium NexusMods account."
 authors = ["Matthew Coulter <53892067+mattcoulter7@users.noreply.github.com>"]
 readme = "README.md"
