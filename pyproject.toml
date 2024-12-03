@@ -9,16 +9,18 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.12,<3.14"
 selenium = "^4.25.0"
 psutil = "*"
 diskcache = "*"
+typer = "^0.14.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-debugpy = "^1.8.6"
-pyinstaller = "*"
+pytest = {version = "^8.3.3"}
+debugpy = {version = "^1.8.0"}
+pyinstaller = {version = "^6.11.0"}
+pytest-dotenv = {version = "^0.5.2"}
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.scripts]
+smai = "skyrim_mod_auto_installer.application.cli:main"
+skyrim_mod_auto_installer = "skyrim_mod_auto_installer.application.cli:main"

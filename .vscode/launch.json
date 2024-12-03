@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "App Entry Point",
+      "name": "cli",
       "type": "debugpy",
       "request": "launch",
-      "program": "app.py",
+      "program": "src/skyrim_mod_auto_installer/application/cli.py",
       "console": "integratedTerminal"
     },
     {
@@ -21,18 +21,16 @@
       "console": "integratedTerminal",
     },
     {
-      "name": "Docker Test Debug",
+      "name": "pytest: current file",
       "type": "python",
-      "request": "attach",
-      "port": 5678,
-      "host": "0.0.0.0",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "${relativeFile}"  // This ensures that the currently opened file in the editor is tested.
+      ],
       "justMyCode": false,
-      "pathMappings": [
-        {
-          "localRoot": "${workspaceFolder}",
-          "remoteRoot": "/app"
-        }
-      ]
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
     },
   ]
 }

@@ -4,29 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Docker Compose",
-            "type": "shell",
-            "command": "docker compose -f docker-compose.yml up --build",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build"
-            },
-            "options": {
-                "shell": {
-                    "executable": "powershell.exe",
-                    "args": [
-                        "-NoExit",
-                        "-Command"
-                    ]
-                },
-                "cwd": "${workspaceFolder}"
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
             "label": "Compile into .exe",
             "type": "shell",
             "command": "poetry",
@@ -36,7 +13,7 @@
                 "--name", "Skyrim Mod Auto Installer",
                 "--icon=assets/icon.ico",
                 "--onefile",
-                "app.py"
+                "src/skyrim_mod_auto_installer/application/cli.py"
             ],
             "problemMatcher": [],
             "group": {
